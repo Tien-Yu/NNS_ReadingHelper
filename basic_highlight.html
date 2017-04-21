@@ -50,15 +50,20 @@ $("div.article").find("p").on({
 		var str = $(this).text(); // text() Sets or returns the text content of selected elements
 		var translateUrl = 'https://script.google.com/macros/s/AKfycbyZ57uPwIUDLz23iM59VqZ7G8eO_Wtd_Uh5Z_Uegj9P_wEBRHQ/exec?source=en&target=zh-tw&q=' + str;
 		translateHoverTexts(translateUrl);
+		highlightHoveredTexts(this, true);
 	},
 	mouseleave: function(){
 		$(".show").html('');
+		//highlightHoveredTexts(this, false);
+		
 	}
 });
+
 // outline function for translation
 function translateHoverTexts(url){
 	httpGetAsync(url, showTranslation);
 }
+
 // http request for the google app script translation
 function httpGetAsync(theUrl, callback)
 {
@@ -77,6 +82,17 @@ function showTranslation(translatedTextJson){
 	var parsedTranslatedText = rawTranslatedText.data.translations[0].translatedText;
 	$(".show").html(parsedTranslatedText);
 } 
+
+function highlightHoveredTexts(paragraph, isHovering){
+	if(isHovering==true){
+		$("div.article").children().css("backgroundColor", "");
+		paragraph.style.backgroundColor = "#99BBFF";
+	}
+	/*else if(isHovering==false){
+		paragraph.style.backgroundColor = "";
+	}*/
+	
+}
 
 </script>
 </body>
