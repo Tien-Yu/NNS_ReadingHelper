@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 <head>
 <style>
 #article
@@ -43,57 +43,113 @@
 	<p class="show"></p>
 	</div>
 <script>
-var colorRainbow = ["#FFDEDE", "#FFF3DE", "#FFFFDE", "#DEFFDE", "#DEFFFF", "#D6D6FF", "#F1DEFF"];
+var colorRainbow = ["#FFDEDE", "#DEFFDE", "#FFFFDE", "#DEFFFF", "#FFF3DE", "#D6D6FF", "#F1DEFF"];
 
 // when hover the paragraph, show the translation.
 $("div.article").find("p").on({
 	mouseenter: function(){
+		//clean the "show" part is needed before showing the translation result 
+		$(".show").html('');
+		
 		var str = $(this).text(); // text() Sets or returns the text content of selected elements
-		var translateUrl = 'https://script.google.com/macros/s/AKfycbyZ57uPwIUDLz23iM59VqZ7G8eO_Wtd_Uh5Z_Uegj9P_wEBRHQ/exec?source=en&target=zh-tw&q=' + str;
-		translateHoverTexts(translateUrl);
-		highlightHoveredTexts(this, true);
+		// split the paragraph to sentences
+		var sentenceArr = splitToSentences(str, 'English');
+		// add space for translated sentences
+		addSpaceForTranslatedSentences(sentenceArr);
+		// translate each sentence and show in the "show" part
+		for(var i=0; i<sentenceArr.length; i++){
+			var translateUrl = 'https://script.google.com/macros/s/AKfycbyZ57uPwIUDLz23iM59VqZ7G8eO_Wtd_Uh5Z_Uegj9P_wEBRHQ/exec?source=en&target=zh-tw&q=' + sentenceArr[i];
+			translateHoverTexts(translateUrl, i);
+		}
+
+		highlightHoveredTexts(this);
 	},
 	mouseleave: function(){
-		$(".show").html('');
-		//highlightHoveredTexts(this, false);
+		//$(".show").html('');
 		
 	}
 });
 
+// add space for translated sentences
+function addSpaceForTranslatedSentences(sentenceArr){
+	// add corresponding number (number of sentences) of <span> to "show" part and set their class name
+	for(var i=0; i<sentenceArr.length; i++){
+		var node = document.createElement("span");
+		document.getElementsByClassName("show")[0].appendChild(node);
+	}
+	for(var i=0; i<sentenceArr.length; i++){
+		document.getElementsByClassName("show")[0].children[i].className = "s"+i;
+	}
+}
+
 // outline function for translation
-function translateHoverTexts(url){
-	httpGetAsync(url, showTranslation);
+function translateHoverTexts(url, idx){
+	httpGetAsync(url, idx, handleTranslation);
 }
 
 // http request for the google app script translation
-function httpGetAsync(theUrl, callback)
+function httpGetAsync(theUrl, idx, callback)
 {
-    var xmlHttp = new XMLHttpRequest();
+	var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() { 
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
+            callback(xmlHttp.responseText, idx);
     }
     xmlHttp.open("GET", theUrl, true); // true for asynchronous 
     xmlHttp.send(null);
 }
 
-// after texts are translated, show translation result in the translation div 
-function showTranslation(translatedTextJson){
+// after texts are translated, handle the translation result
+function handleTranslation(translatedTextJson, idx){
+
+	// parse JSON array
 	var rawTranslatedText = JSON.parse(translatedTextJson);
 	var parsedTranslatedText = rawTranslatedText.data.translations[0].translatedText;
-	$(".show").html(parsedTranslatedText);
+
+	// show translation result in the translation div
+	showTranslation(parsedTranslatedText, idx);	
 } 
 
-// highlight the whole paragraph that is hovering
-function highlightHoveredTexts(paragraph, isHovering){
-	if(isHovering==true){
-		$("div.article").children().css("backgroundColor", "");
-		paragraph.style.backgroundColor = colorRainbow[6];
+// split the paragraph to sentences
+function splitToSentences(str, language){
+	if(language=="English"){
+		var sentenceArr = str.split(". ");
+		// add '.' back except the last sentence
+		for(var i=0; i<sentenceArr.length-1; i++){
+			sentenceArr[i] = sentenceArr[i] + '.';
+		}
+		console.log(language + ' : ' + sentenceArr.length);
 	}
-	/*else if(isHovering==false){
-		paragraph.style.backgroundColor = "";
-	}*/
+	else if(language=="Chinese"){
+		var sentenceArr = str.split("。");
+		// add '。' back except the last sentence
+		for(var i=0; i<sentenceArr.length-1; i++){
+			sentenceArr[i] = sentenceArr[i] + '。';
+		}
+		console.log(language + ' : ' + (sentenceArr.length-1));
+	}
+	return sentenceArr;
+}
+
+// show translation result in the translation div
+function showTranslation(str, idx){
+		
+    //console.log("span.s"+idx);
+	$(".show").find("span.s"+idx).html(str);
+	$(".show").find("span.s"+idx).attr('style',  'background-color:'+colorRainbow[idx]);
 	
+	// clean the "show" div is needed before showing the translation result
+	/*$(".show").html('').promise().done(function(){
+        for(var i=0; i<strArr.length; i++){
+			$(".show").append('<span style="background-color:' + colorRainbow[i] + '">'+strArr[i]+'</span>');
+		}
+    });*/
+}
+
+// highlight the whole paragraph that is hovering
+function highlightHoveredTexts(paragraph){
+	$("div.article").children().css("backgroundColor", "");
+	paragraph.style.backgroundColor = colorRainbow[6];
 }
 
 </script>
