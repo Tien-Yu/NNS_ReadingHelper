@@ -12,7 +12,8 @@
 	display:inline;
 }
 </style>
-	
+<!----------------jQuery----------------->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>	
 </head>
 
 <body>
@@ -42,7 +43,24 @@
 	<p id="show"></p>
 	</div>
 <script>
-document.getElementById("article").onmouseover = httpGetAsync('https://script.google.com/macros/s/AKfycbyZ57uPwIUDLz23iM59VqZ7G8eO_Wtd_Uh5Z_Uegj9P_wEBRHQ/exec?source=en&target=zh-tw&q=You are a pig', showTranslation);
+	
+// when hover the paragraph, show the translation.
+//document.getElementById("article").onmouseover = httpGetAsync('https://script.google.com/macros/s/AKfycbyZ57uPwIUDLz23iM59VqZ7G8eO_Wtd_Uh5Z_Uegj9P_wEBRHQ/exec?source=en&target=zh-tw&q=You are a pig', showTranslation);
+$("p").on({
+	mouseenter: function(){
+		var str = $(this).text(); // text() Sets or returns the text content of selected elements
+		var translateUrl = 'https://script.google.com/macros/s/AKfycbyZ57uPwIUDLz23iM59VqZ7G8eO_Wtd_Uh5Z_Uegj9P_wEBRHQ/exec?source=en&target=zh-tw&q=' + str;
+		translateHoverTexts(translateUrl);
+	},
+	mouseleave: function(){
+		$("#show").html('');
+	}
+});
+// outline function for translation
+function translateHoverTexts(url){
+	httpGetAsync(url, showTranslation);
+}
+// http request for the google app script translation
 function httpGetAsync(theUrl, callback)
 {
     var xmlHttp = new XMLHttpRequest();
@@ -53,9 +71,14 @@ function httpGetAsync(theUrl, callback)
     xmlHttp.open("GET", theUrl, true); // true for asynchronous 
     xmlHttp.send(null);
 }
-function showTranslation(translatedText){
-	document.getElementById("show").innerHTML = translatedText;
+
+// after texts are translated, show translation result in the translation div 
+function showTranslation(translatedTextJson){
+	var rawTranslatedText = JSON.parse(translatedTextJson);
+	var parsedTranslatedText = rawTranslatedText.data.translations[0].translatedText;
+	$("#show").html(parsedTranslatedText);
 } 
+
 </script>
 </body>
 
