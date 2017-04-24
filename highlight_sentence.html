@@ -23,22 +23,21 @@
 	<div class="article">
 		<h1>Chinese Population Growth</h1>
 		<p>
-		Increases in population have usually been accompanied (indeed facilitated) by an increase in trade. In the Western experience, commerce provided the conditions that allowed industrialization to get started, which in turn led to growth in science, technology, industry, transport, communications, social change, and the like that we group under the broad term of "development". However, the massive increase in population that in Europe was at first attributed to industrialization starting in the eighteenth century occurred also and at the same period in China, even though there was no comparable industrialization.
+		I am a student. He is a teacher. I am reading. Pig is fat.
 		</p>
 		<p>
-		It is estimated that the Chinese population by 1600 was close to 150 million. The transition between the Ming and Qing dynasties (the seventeenth century) may have seen a decline, but from 1741 to 1851 the annual figures rose steadily and spectacularly, perhaps beginning with 143 million and ending with 432 million. If we accept these totals, we are confronted with a situation in which the Chinese population doubled in the 50 years from 1790 to 1840. If, with greater caution, we assume lower totals in the early eighteenth century and only 400 million in 1850, we still face a startling fact: something like a doubling of the vast Chinese population in the century before Western contact, foreign trade, and industrialization could have had much effect.
+		University is good. Friends are important.
 		</p>
 		<p>
-		To explain this sudden increase we cannot point to factors constant in Chinese society but must find conditions or a combination of factors that were newly effective in this period. Among these is the almost complete internal peace maintained under Manchu rule during the eighteenth century. There was also an increase in foreign trade through Guangzhou (southern China) and some improvement of transportation within the empire. Control of disease, like the checking of smallpox by variolation may have been important. But of most critical importance was the food supply.
+		Testing is complicated. He is good.
 		</p>
 		<p>
-		Confronted with a multitude of unreliable figures, economists have compared the population records with the aggregate data for cultivated land area and grain production in the six centuries since 1368. Assuming that China's population in 1400 was about 80 million, the economist Dwight Perkins concludes that its growth to 700 million or more in the 1960s was made possible by a steady increase in the grain supply, which evidently grew five or six times between 1400 and 1800 and rose another 50 percent between 1800 and 1965. This increase of food supply was due perhaps half to the increase of cultivated area, particularly by migration and settlement in the central and western provinces, and half to greater productivity--the farmers' success in raising more crops per unit of land.
+		Population grows.</p>
+		<p>
+		Taiwan is a country. Brad is my brother
 		</p>
 		<p>
-		This technological advance took many forms: one was the continual introduction from the south of earlier-ripening varieties of rice, which made possible double-cropping (the production of two harvests per year from one field). New crops such as corn (maize) and sweet potatoes as well as peanuts and tobacco were introduced from the Americas. Corn, for instance, can be grown on the dry soil and marginal hill land of North China, where it is used for food, fuel, and fodder and provides something like one-seventh of the food energy available in the area. The sweet potato, growing in sandy soil and providing more food energy per unit of land than other crops, became the main food of the poor in much of the South China rice area.
-		</p>
-		<p>
-		Productivity in agriculture was also improved by capital investments, first of all in irrigation. From 1400 to 1900 the total of irrigated land seems to have increased almost three times. There was also a gain in farm tools, draft animals, and fertilizer, to say nothing of the population growth itself, which increased half again as fast as cultivated land area and so increased the ratio of human hands available per unit of land. Thus the rising population was fed by a more intensive agriculture, applying more labor and fertilizer to the land.
+		Exercise is important. Give me more words.
 		</p>
 	</div>
 	<div class="translation">
@@ -49,7 +48,7 @@
 var colorRainbow = ["#FFDEDE", "#DEFFDE", "#F1DEFF", "#FFFFDE", "#DEFFFF", "#D6D6FF", "#FFF3DE"];
 
 // when hover the paragraph, show the translation.
-$("div.article").find("p,h1").on({
+$("div.article").find("p").on({
 	mouseenter: function(){
 		//clean the "show" part is needed before showing the translation result 
 		$(".show").html('');
@@ -58,139 +57,121 @@ $("div.article").find("p,h1").on({
 		// split the paragraph to sentences
 		var sentenceArr = splitToSentences(str, 'English');
 		
+		// get the "top" position of this paragraph (relative to tje window)
+		var paragraphTopPos = $(this).offset().top;
+		console.log(paragraphTopPos);
+		
 		// color the original English paragraph
-		colorParagraph(sentenceArr, this, function(){
-			doB(sentenceArr);
+		colorParagraph(sentenceArr, this, paragraphTopPos, function(){
+			startTranslate(sentenceArr, paragraphTopPos);
 		});
 		
-		/*
-		// color the original English paragraph
-		colorParagraph(sentenceArr, this);
-		
-		// add space for translated sentences
-		addSpaceForTranslatedSentences(sentenceArr);
-		// translate each sentence and show in the "show" part
-		for(var i=0; i<sentenceArr.length; i++){
-			var translateUrl = 'https://script.google.com/macros/s/AKfycbyZ57uPwIUDLz23iM59VqZ7G8eO_Wtd_Uh5Z_Uegj9P_wEBRHQ/exec?source=en&target=zh-tw&q=' + sentenceArr[i];
-			translateHoverTexts(translateUrl, i);
-		}
-		*/
-		//highlightHoveredTexts(this);
+		// for DEBUG
+		console.log(this.innerHTML);
 	},
 	mouseleave: function(){
 		//$(".show").html('');
+		console.log("leave");
 		
 	}
 });
 // color the original English paragraph
-function colorParagraph(sentenceArr, paragraph, callback){
+function colorParagraph(sentenceArr, paragraph, paragraphTopPos, callback){
 	setTimeout( function(){
 		// first set the background of the article transparent
 		$("div.article").find("*").css("background-color", "");
 		
-		// then clean the original paragraph
-		console.log(paragraph.innerHTML);
-		paragraph.innerHTML = "";
-	
-		// then substitue with the colored one
+		/* then add <span> tag to each sentence */
+		if(paragraph.innerHTML.search('</span>')==-1){ // if this is the first visit to the paragraph
+			for(var i=0; i<sentenceArr.length; i++){
+				var newStr = paragraph.innerHTML.replace(sentenceArr[i], '<span class="os'+i+'">'+sentenceArr[i]+'</span>');
+				paragraph.innerHTML = newStr;
+				paragraph.children[i].style.background = colorRainbow[i];
+			}
+		}
+		// then color the sentences of the original English paragraph
 		for(var i=0; i<sentenceArr.length; i++){
-			paragraph.innerHTML += '<span class="os'+i+'">'+sentenceArr[i]+'</span>';
-			console.log(paragraph.children[i]);
 			paragraph.children[i].style.background = colorRainbow[i];
 		}
 		if(callback){
 			callback(sentenceArr);
-		}
+		}		
 	}, 0 );
-	
+		
 }
-function doB(sentenceArr){
+function startTranslate(sentenceArr, paragraphTopPos){
 	// add space for translated sentences
 	addSpaceForTranslatedSentences(sentenceArr);
 	// translate each sentence and show in the "show" part
 	for(var i=0; i<sentenceArr.length; i++){
 		var translateUrl = 'https://script.google.com/macros/s/AKfycbz5GfFa73yU_xI2tM5L1LdriW8zKQoxkEzG81SrnZt_574Q2Ko/exec?source=en&target=zh-tw&q=' + sentenceArr[i];
-		translateHoverTexts(translateUrl, i);
+		translateHoverTexts(translateUrl, i, paragraphTopPos);
 	}
 }
 
-
-
-
 // add space for translated sentences
 function addSpaceForTranslatedSentences(sentenceArr){
+	// add <p></p> to wrap the translated senetences
+	var node = document.createElement("p");
+	document.getElementsByClassName("show")[0].appendChild(node);
+	document.getElementsByClassName("show")[0].children[0].className = "translated_paragragh";
 	// add corresponding number (number of sentences) of <span> to "show" part and set their class name
 	for(var i=0; i<sentenceArr.length; i++){
 		var node = document.createElement("span");
-		document.getElementsByClassName("show")[0].appendChild(node);
+		document.getElementsByClassName("translated_paragragh")[0].appendChild(node);
 	}
 	for(var i=0; i<sentenceArr.length; i++){
-		document.getElementsByClassName("show")[0].children[i].className = "s"+i;
+		document.getElementsByClassName("translated_paragragh")[0].children[i].className = "s"+i;
 	}
 }
 
 // outline function for translation
-function translateHoverTexts(url, idx){
-	httpGetAsync(url, idx, handleTranslation);
+function translateHoverTexts(url, idx, paragraphTopPos){
+	httpGetAsync(url, idx, paragraphTopPos, handleTranslation);
 }
 
 // http request for the google app script translation
-function httpGetAsync(theUrl, idx, callback)
+function httpGetAsync(theUrl, idx, paragraphTopPos, callback)
 {
 	var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() { 
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText, idx);
+            callback(xmlHttp.responseText, idx, paragraphTopPos);
     }
     xmlHttp.open("GET", theUrl, true); // true for asynchronous 
     xmlHttp.send(null);
 }
 
 // after texts are translated, handle the translation result
-function handleTranslation(translatedTextJson, idx){
+function handleTranslation(translatedTextJson, idx, paragraphTopPos){
 
 	// parse JSON array
 	var rawTranslatedText = JSON.parse(translatedTextJson);
 	var parsedTranslatedText = rawTranslatedText.data.translations[0].translatedText;
 
 	// show translation result in the translation div
-	showTranslation(parsedTranslatedText, idx);	
+	showTranslation(parsedTranslatedText, idx, paragraphTopPos);	
 } 
 
 // split the paragraph to sentences
 function splitToSentences(str, language){
-	if(language=="English"){
-		var sentenceArr = str.split(". ");
-		// add '.' back except the last sentence
-		for(var i=0; i<sentenceArr.length-1; i++){
-			sentenceArr[i] = sentenceArr[i] + '. ';
-		}
-		console.log(language + ' : ' + sentenceArr.length);
+	var sentenceArr = str.split(". ");
+	// add '.' back except the last sentence
+	for(var i=0; i<sentenceArr.length-1; i++){
+		sentenceArr[i] = sentenceArr[i] + '. ';
 	}
-	else if(language=="Chinese"){
-		var sentenceArr = str.split("。");
-		// add '。' back except the last sentence
-		for(var i=0; i<sentenceArr.length-1; i++){
-			sentenceArr[i] = sentenceArr[i] + '。';
-		}
-		console.log(language + ' : ' + (sentenceArr.length-1));
-	}
+	console.log(language + ' : ' + sentenceArr.length);
 	return sentenceArr;
 }
 
 // show translation result in the translation div
-function showTranslation(str, idx){
+function showTranslation(str, idx, paragraphTopPos){
 		
     //console.log("span.s"+idx);
 	$(".show").find("span.s"+idx).html(str);
 	$(".show").find("span.s"+idx).attr('style',  'background-color:'+colorRainbow[idx]);
-	
-	// clean the "show" div is needed before showing the translation result
-	/*$(".show").html('').promise().done(function(){
-        for(var i=0; i<strArr.length; i++){
-			$(".show").append('<span style="background-color:' + colorRainbow[i] + '">'+strArr[i]+'</span>');
-		}
-    });*/
+	$(".translated_paragragh").offset({ top: paragraphTopPos });
+
 }
 
 // highlight the whole paragraph that is hovering
