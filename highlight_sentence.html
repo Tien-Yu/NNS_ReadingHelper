@@ -27,54 +27,68 @@
 
 <body>
 	<div class="article">
-		<h1>Chinese Population Growth</h1>
-		<p>
+	<h1>Chinese Population Growth</h1>
+	<p>
 	Increases in population have usually been accompanied (indeed facilitated) by an increase in trade. In the Western experience, commerce provided the conditions that allowed industrialization to get started, which in turn led to growth in science, technology, industry, transport, communications, social change, and the like that we group under the broad term of "development". However, the massive increase in population that in Europe was at first attributed to industrialization starting in the eighteenth century occurred also and at the same period in China, even though there was no comparable industrialization.
-	</p>
+	</p><br>
 	<p>
 	It is estimated that the Chinese population by 1600 was close to 150 million. The transition between the Ming and Qing dynasties (the seventeenth century) may have seen a decline, but from 1741 to 1851 the annual figures rose steadily and spectacularly, perhaps beginning with 143 million and ending with 432 million. If we accept these totals, we are confronted with a situation in which the Chinese population doubled in the 50 years from 1790 to 1840. If, with greater caution, we assume lower totals in the early eighteenth century and only 400 million in 1850, we still face a startling fact: something like a doubling of the vast Chinese population in the century before Western contact, foreign trade, and industrialization could have had much effect.
-	</p>
+	</p><br>
 	<p>
 	To explain this sudden increase we cannot point to factors constant in Chinese society but must find conditions or a combination of factors that were newly effective in this period. Among these is the almost complete internal peace maintained under Manchu rule during the eighteenth century. There was also an increase in foreign trade through Guangzhou (southern China) and some improvement of transportation within the empire. Control of disease, like the checking of smallpox by variolation may have been important. But of most critical importance was the food supply.
-	</p>
+	</p><br>
 	<p>
 	Confronted with a multitude of unreliable figures, economists have compared the population records with the aggregate data for cultivated land area and grain production in the six centuries since 1368. Assuming that China's population in 1400 was about 80 million, the economist Dwight Perkins concludes that its growth to 700 million or more in the 1960s was made possible by a steady increase in the grain supply, which evidently grew five or six times between 1400 and 1800 and rose another 50 percent between 1800 and 1965. This increase of food supply was due perhaps half to the increase of cultivated area, particularly by migration and settlement in the central and western provinces, and half to greater productivity--the farmers' success in raising more crops per unit of land.
-	</p>
+	</p><br>
 	<p>
 	This technological advance took many forms: one was the continual introduction from the south of earlier-ripening varieties of rice, which made possible double-cropping (the production of two harvests per year from one field). New crops such as corn (maize) and sweet potatoes as well as peanuts and tobacco were introduced from the Americas. Corn, for instance, can be grown on the dry soil and marginal hill land of North China, where it is used for food, fuel, and fodder and provides something like one-seventh of the food energy available in the area. The sweet potato, growing in sandy soil and providing more food energy per unit of land than other crops, became the main food of the poor in much of the South China rice area.
-	</p>
+	</p><br>
 	<p>
 	Productivity in agriculture was also improved by capital investments, first of all in irrigation. From 1400 to 1900 the total of irrigated land seems to have increased almost three times. There was also a gain in farm tools, draft animals, and fertilizer, to say nothing of the population growth itself, which increased half again as fast as cultivated land area and so increased the ratio of human hands available per unit of land. Thus the rising population was fed by a more intensive agriculture, applying more labor and fertilizer to the land.
-	</p>
+	</p><br>
 	</div>
 	<div class="translation">
 		
 		<p class="show"></p>
 	</div>
 <script>
+
+// Initialize the colors array
 var colorRainbow = ["#FFDEDE", "#DEFFDE", "#F1DEFF", "#FFFFDE", "#DEFFFF", "#D6D6FF", "#FFF3DE", '#000000', '#000000', '#000000', '#000000', '#000000'];
+
+// Create the "isVisiting" attribute to each paragraph in the article, and initialize them "false" (not visiting) 
+for(var i=0; i<$("div.article").find("p").length;i++){
+	var thisP = $("div.article").find("p")[i];
+	var att = document.createAttribute("isVisiting");
+	att.value = "false";
+	thisP.setAttributeNode(att);
+	//console.log($("div.article").find("p")[i].getAttributeNode("isVisiting").value);
+}
+
 
 // when hover the paragraph, show the translation.
 $("div.article").find("p").on({
 	mouseenter: function(){
-		//clean the "show" part is needed before showing the translation result 
-		$(".show").html('');
 		
-		var str = $(this).text(); // text() Sets or returns the text content of selected elements
-		// split the paragraph to sentences
-		var sentenceArr = splitToSentences(str, 'English');
-		
-		// get the "top" position of this paragraph (relative to tje window)
-		var paragraphTopPos = $(this).offset().top;
-		console.log(paragraphTopPos);
-		
-		// color the original English paragraph
-		colorParagraph(sentenceArr, this, paragraphTopPos, function(){
-			startTranslate(sentenceArr, paragraphTopPos);
-		});
-		
-		// for DEBUG
-		console.log(this.innerHTML);
+		// check if the paragraph is visiting (leave the paragraph just for watching translation)
+		if(this.getAttribute("isVisiting")=="false"){
+			//clean the "show" part is needed before showing the translation result 
+			$(".show").html('');
+			
+			var str = $(this).text(); // text() Sets or returns the text content of selected elements
+			// split the paragraph to sentences
+			var sentenceArr = splitToSentences(str, 'English');
+			
+			// get the "top" position of this paragraph (relative to tje window)
+			var paragraphTopPos = $(this).offset().top;
+			console.log(paragraphTopPos);
+			
+			// color the original English paragraph
+			colorParagraph(sentenceArr, this, paragraphTopPos, function(){
+				startTranslate(sentenceArr, paragraphTopPos);
+			});
+		}
+				
 	},
 	mouseleave: function(){
 		//$(".show").html('');
@@ -85,6 +99,19 @@ $("div.article").find("p").on({
 // color the original English paragraph
 function colorParagraph(sentenceArr, paragraph, paragraphTopPos, callback){
 	setTimeout( function(){
+	
+		// mark this paragraph as "visiting" and others are not
+		paragraph.setAttribute("isVisiting", "true");
+		for(var i=0; i<$("div.article").find("p").length;i++){
+			if($("div.article").find("p")[i] != paragraph){
+				$("div.article").find("p")[i].setAttribute("isVisiting", "false");
+			}
+		}
+		//DEBUG
+		/*for(var i=0; i<$("div.article").find("p").length;i++){
+			console.log($("div.article").find("p")[i].getAttribute("isVisiting"));
+		}*/
+		
 		// first set the background of the article transparent
 		$("div.article").find("*").css("background-color", "");
 		
