@@ -7,16 +7,17 @@
 	width:40%;
 	display:inline;
 	float:left;
-	padding: 25px 10% 25px;
+	padding: 25px 15% 25px;
 	height:1000px;
 	border-right: 3px solid lightgrey;
 }
 .translation
 {
-	width:35%;
+	width:25%;
 	display:inline;
 	float:right;
 	padding: 25px 2.5% 25px;
+	line-height: 200%;
 }
 
 
@@ -79,14 +80,12 @@ $("div.article").find("p").on({
 			// split the paragraph to sentences
 			var sentenceArr = splitToSentences(str, 'English');
 			
-			// get the "top" position of this paragraph (relative to tje window)
+			/*// get the "top" position of this paragraph (relative to tje window)
 			var paragraphTopPos = $(this).offset().top;
-			console.log(paragraphTopPos);
+			console.log(paragraphTopPos);*/
 			
 			// color the original English paragraph
-			colorParagraph(sentenceArr, this, paragraphTopPos, function(){
-				startTranslate(sentenceArr, paragraphTopPos);
-			});
+			colorParagraph(sentenceArr, this, startTranslate);
 		}
 				
 	},
@@ -97,7 +96,7 @@ $("div.article").find("p").on({
 	}
 });
 // color the original English paragraph
-function colorParagraph(sentenceArr, paragraph, paragraphTopPos, callback){
+function colorParagraph(sentenceArr, paragraph, callback){
 	setTimeout( function(){
 	
 		// mark this paragraph as "visiting" and others are not
@@ -112,10 +111,11 @@ function colorParagraph(sentenceArr, paragraph, paragraphTopPos, callback){
 			console.log($("div.article").find("p")[i].getAttribute("isVisiting"));
 		}*/
 		
+		/* COLOR */
 		// first set the background of the article transparent
 		$("div.article").find("*").css("background-color", "");
 		
-		/* then add <span> tag to each sentence */
+		// then add <span> tag to each sentence //
 		if(paragraph.innerHTML.search('</span>')==-1){ // if this is the first visit to the paragraph
 			for(var i=0; i<sentenceArr.length; i++){
 				var newStr = paragraph.innerHTML.replace(sentenceArr[i], '<span class="os'+i+'">'+sentenceArr[i]+'</span>');
@@ -127,8 +127,20 @@ function colorParagraph(sentenceArr, paragraph, paragraphTopPos, callback){
 		for(var i=0; i<sentenceArr.length; i++){
 			paragraph.children[i].style.background = colorRainbow[i];
 		}
+		
+		
+		/* BROADEN THE DISTANCE BETWEEN LINES IN A TEXT */
+		// first set the line weight of the article initial
+		$("div.article").find("*").css("line-height", "initial");
+		// then set the line weight of this paragraph
+		paragraph.style.lineHeight = "200%";
+		
+		// get the "top" position of this paragraph (relative to tje window)
+		var paragraphTopPos = paragraph.offsetTop;
+		console.log(paragraphTopPos);
+		
 		if(callback){
-			callback(sentenceArr);
+			callback(sentenceArr, paragraphTopPos);
 		}		
 	}, 0 );
 		
@@ -205,6 +217,7 @@ function showTranslation(str, idx, paragraphTopPos){
 	$(".show").find("span.s"+idx).html(str);
 	$(".show").find("span.s"+idx).attr('style',  'background-color:'+colorRainbow[idx]);
 	$(".translated_paragragh").offset({ top: paragraphTopPos });
+	
 
 }
 
